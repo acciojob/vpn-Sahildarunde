@@ -8,38 +8,25 @@ import javax.persistence.*;
 @Table(name="connection")
 public class Country {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
 
-    @Column(name = "country_name")
-    CountryName countryName;
+    private CountryName countryName;
 
-    @Column(name = "code")
-    String code;
-
-    @OneToOne(mappedBy = "country", cascade = CascadeType.ALL)
-    User user;
+    private String code;
 
     @ManyToOne
     @JoinColumn
-    ServiceProvider serviceProvider;
+    private ServiceProvider serviceProvider;
 
-    public Country(int id, CountryName countryName, String code, User user, ServiceProvider serviceProvider) {
-        this.id = id;
-        this.countryName = countryName;
-        this.code = code;
-        this.user = user;
-        this.serviceProvider = serviceProvider;
-    }
+    //user as parent in oneonone
+    @OneToOne
+    @JoinColumn
+    private User user;
 
     public Country() {
-    }
-
-    public Country(CountryName countryName, String code, User user) {
-        this.countryName = countryName;
-        this.code = code;
-        this.user = user;
     }
 
     public Country(CountryName countryName, String code) {
@@ -47,8 +34,12 @@ public class Country {
         this.code = code;
     }
 
-    public Country(String countryName) {
-        this.countryName = CountryName.valueOf(countryName);
+    public Country(int id, CountryName countryName, String code, ServiceProvider serviceProvider, User user) {
+        this.id = id;
+        this.countryName = countryName;
+        this.code = code;
+        this.serviceProvider = serviceProvider;
+        this.user = user;
     }
 
     public int getId() {
@@ -75,19 +66,19 @@ public class Country {
         this.code = code;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     public ServiceProvider getServiceProvider() {
         return serviceProvider;
     }
 
     public void setServiceProvider(ServiceProvider serviceProvider) {
         this.serviceProvider = serviceProvider;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

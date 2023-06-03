@@ -3,34 +3,31 @@ package com.driver.model;
 import org.springframework.boot.test.autoconfigure.data.cassandra.DataCassandraTest;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="user")
 public class Admin {
-    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
-    @Column(name = "username", unique = true, nullable = false)
-    String username;
-    @Column(name = "password", unique = true, nullable = false)
-    String password;
+    @Id
+    private int id;
 
-    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL)
-    List<ServiceProvider> serviceProviders;
+    private String username;
 
-    public Admin(int id, String username, String password) {
+    private String password;
+
+    @OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
+    List<ServiceProvider> serviceProviders = new ArrayList<>();
+
+    public Admin() {
+    }
+
+    public Admin(int id, String username, String password, List<ServiceProvider> serviceProviders) {
         this.id = id;
         this.username = username;
         this.password = password;
-    }
-
-    public Admin(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public Admin() {
+        this.serviceProviders = serviceProviders;
     }
 
     public int getId() {

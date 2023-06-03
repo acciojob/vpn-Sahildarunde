@@ -1,8 +1,5 @@
 package com.driver.services.impl;
 
-import com.driver.exceptions.AdminNotPresentException;
-import com.driver.exceptions.CountryNotFoundException;
-import com.driver.exceptions.ServiceProviderNotFoundException;
 import com.driver.model.Admin;
 import com.driver.model.Country;
 import com.driver.model.CountryName;
@@ -32,46 +29,38 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin register(String username, String password) {
-        Admin admin = new Admin(username, password);
+        Admin admin = new Admin();
+        admin.setUsername(username);
+        admin.setPassword(password);
         adminRepository1.save(admin);
         return admin;
+
     }
 
     @Override
-    public Admin addServiceProvider(int adminId, String providerName) throws AdminNotPresentException {
-        Optional<Admin> admin = adminRepository1.findById(adminId);
-        if(!admin.isPresent()){
-            throw new AdminNotPresentException("Admin not Registered");
-        }
-        ServiceProvider serviceProvider = new ServiceProvider(providerName);
-        serviceProvider.setAdmin(admin.get());
-
-        Admin Admin1 = admin.get();
-        List<ServiceProvider> serviceProviderList = Admin1.getServiceProviders();
+    public Admin addServiceProvider(int adminId, String providerName){
+        Admin admin = adminRepository1.findById(adminId).get();
+        ServiceProvider serviceProvider = new ServiceProvider();
+        serviceProvider.setName(providerName);
+        serviceProvider.setAdmin(admin);
+        List<ServiceProvider> serviceProviderList = admin.getServiceProviders();
         serviceProviderList.add(serviceProvider);
-        Admin1.setServiceProviders(serviceProviderList);
+        admin.setServiceProviders(serviceProviderList);
+        adminRepository1.save(admin);
+        return admin;
 
-        return Admin1;
     }
 
     @Override
     public ServiceProvider addCountry(int serviceProviderId, String countryName) throws Exception{
-        if(countryName.equals(countryName.toLowerCase())){
-            countryName = countryName.toUpperCase();
-        }
+        String countryName1 = countryName.toUpperCase();
+        if (!countryName1.equals("IND") && !countryName1.equals("USA") && !countryName1.equals("CHI") && !countryName1.equals("JPN")) throw new Exception("Country not found");
 
-        if(!CountryName.values().equals(countryName)){
-            throw new CountryNotFoundException("Country not found");
-        }
-        Country country = new Country(countryName);
-        Optional<ServiceProvider> serviceProvider = serviceProviderRepository1.findById(serviceProviderId);
-        if(!serviceProvider.isPresent()){
-            throw new ServiceProviderNotFoundException("Service Provider not found");
-        }
-        List<Country> countryList = serviceProvider.get().getCountrys();
-        countryList.add(country);
-        serviceProvider.get().setCountrys(countryList);
-
-        return serviceProvider.get();
+        ServiceProvider serviceProvider = serviceProviderRepository1.findById(serviceProviderId).get();
+        Country country = new Country(CountryName.valueOf(countryName1),CountryName.valueOf(countryName1).toCode());
+        country.setServiceProvider(serviceProvider);
+        serviceProvider.getCountryList().add(country);
+        serviceProviderRepository1.save(serviceProvider);
+        return serviceProvider;
     }
 }
